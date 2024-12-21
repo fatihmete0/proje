@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Fonksiyon araba rengini küçük harfe çevirerek karşılaştırmayı kolaylaştırır.
+void to_lowercase(char *str) {
+    for (int i = 0; str[i]; i++) {
+        str[i] = tolower(str[i]);
+    }
+}
+
+// Fiyat hesaplama fonksiyonu
+float calculate_price(const char *color, float price) {
+    if (strcmp(color, "sari") == 0 || strcmp(color, "lacivert") == 0) {
+        return price * 0.90; // %10 indirim uygula
+    }
+    return price; // İndirim yok
+}
+
+// Araç bilgilerini dosyaya kaydetme fonksiyonu
+void save_to_file(const char *color, float price) {
+    FILE *file = fopen("car_data.txt", "a"); // Dosyayı ekleme modunda aç
+    if (file == NULL) {
+        printf("Dosya açılamadı!\n");
+        return;
+    }
+    fprintf(file, "Renk: %s, Fiyat: %.2f\n", color, price);
+    fclose(file);
+}
+
+int main() {
+    char colors[5][20]; // Maksimum 5 araç bilgisi saklanabilir
+    float prices[5];
+    int num_cars;
+
+    printf("Kaç aracın bilgilerini gireceksiniz? (Maksimum 5): ");
+    scanf("%d", &num_cars);
+
+    if (num_cars > 5 || num_cars <= 0) {
+        printf("Geçersiz araç sayısı!\n");
+        return 1;
+    }
+
+    // Araç bilgilerini alma
+    for (int i = 0; i < num_cars; i++) {
+        printf("\n%d. araç için oto yıkama ücretini girin: ", i + 1);
+        scanf("%f", &prices[i]);
+
+        printf("%d. araç için rengini girin (sarı veya lacivert için indirim geçerli): ", i + 1);
+        scanf("%s", colors[i]);
+
+        to_lowercase(colors[i]);
+        prices[i] = calculate_price(colors[i], prices[i]);
+    }
+
+    // Bilgileri ekrana ve dosyaya yazma
+    printf("\n--- Araç Bilgileri ---\n");
+    for (int i = 0; i < num_cars; i++) {
+        printf("%d. Araç - Renk: %s, Ödenecek Fiyat: %.2f TL\n", i + 1, colors[i], prices[i]);
+        save_to_file(colors[i], prices[i]);
+    }
+
+    printf("\nBilgiler 'car_data.txt' dosyasına kaydedildi.\n");
+    return 0;
+}
